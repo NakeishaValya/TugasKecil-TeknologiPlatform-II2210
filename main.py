@@ -80,6 +80,5 @@ async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotat
 if __name__ == "__main__":
     # Membuat database dan tabel jika belum ada
     create_db_and_tables()
-    
     # Menjalankan server uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run(app, host="0.0.0.0", port=17787)
