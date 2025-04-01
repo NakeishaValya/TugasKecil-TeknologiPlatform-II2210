@@ -1,38 +1,33 @@
 import secrets
 import base64
 import pyotp
+import uvicorn
 import random
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from sqlmodel import create_engine, Session, SQLModel, Field, select
-from typing import Annotated
 from fastapi.responses import HTMLResponse
-
-# Model Database
-class MOTDBase(SQLModel):
-    message: str
-
-class MOTD(MOTDBase, table=True):
-    id: int = Field(default=None, primary_key=True)
+from fastapi.staticfiles import StaticFiles
+from sqlmodel import create_engine, Session, SQLModel, select
+from typing import Annotated
+from model import MOTD, MOTDBase
 
 # SQLite Database
 sqlite_file_name = "motd.db"
-sqlite_url = f"sqlite:///" + sqlite_file_name
+sqlite_url = f"sqlite:////{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
-
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
-
 def get_session():
     with Session(engine) as session:
         yield session
-
 SessionDep = Annotated[Session, Depends(get_session)]
 
+# FastAPI
 app = FastAPI(docs_url=None, redoc_url=None)
 security = HTTPBasic()
 
+# Users - lengkapi dengan userid dan shared_secret yang sesuai
 users = {
     "sister": "ii2210_sister_semangatTucil",
     "vaelya": "ii2210_koicaKeren"
@@ -40,16 +35,22 @@ users = {
 
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    with open("index.html", "r", encoding="utf-8") as file:
-        return file.read()
+    # Mengembalikan file index.html
+    with open("index.html", "r") as file:
+        html_content = file.read()
+    return HTMLResponse(content=html_content)
 
 @app.get("/motd")
 async def get_motd(session: SessionDep):
+    # Mengambil message of the day secara acak dari database
     statement = select(MOTD)
     results = session.exec(statement).all()
+    
     if not results:
-        raise HTTPException(status_code=404, detail="No MOTD available.")
-    return random.choice(results)
+        return {"message": "No messages available"}
+    
+    random_message = random.choice(results)
+    return {"message": random_message.message}
 
 @app.post("/motd")
 async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
@@ -64,11 +65,11 @@ async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotat
             valid_password = secrets.compare_digest(current_password_bytes, totp.now().encode("utf8"))
 
             if valid_password and valid_username:
+                # Menambahkan message of the day baru ke database
                 new_motd = MOTD(message=message.message)
                 session.add(new_motd)
                 session.commit()
-                session.refresh(new_motd)
-                return new_motd
+                return {"status": "success", "message": "Message added successfully"}
             else:
                 raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid userid or password.")
         else:
@@ -77,6 +78,8 @@ async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotat
         raise e
 
 if __name__ == "__main__":
-    import uvicorn
+    # Membuat database dan tabel jika belum ada
     create_db_and_tables()
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    
+    # Menjalankan server uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
