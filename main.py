@@ -1,12 +1,11 @@
 import secrets
 import base64
 import pyotp
-import uvicorn
 import random
-from fastapi import FastAPI, Depends, HTTPException, status, Request
+from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse, JSONResponse
 from sqlmodel import create_engine, Session, SQLModel, select
 from typing import Annotated
 from model import MOTD, MOTDBase
@@ -16,11 +15,14 @@ sqlite_file_name = "motd.db"
 sqlite_url = f"sqlite:////{sqlite_file_name}"
 connect_args = {"check_same_thread": False}
 engine = create_engine(sqlite_url, connect_args=connect_args)
+
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
+
 def get_session():
     with Session(engine) as session:
         yield session
+
 SessionDep = Annotated[Session, Depends(get_session)]
 
 # FastAPI
@@ -28,57 +30,69 @@ app = FastAPI(docs_url=None, redoc_url=None)
 security = HTTPBasic()
 
 # Users - lengkapi dengan userid dan shared_secret yang sesuai
-users = {
+allowed_users = {
     "sister": "ii2210_sister_semangatTucil",
     "vaelya": "ii2210_koicaKeren"
 }
 
-@app.get("/", response_class=HTMLResponse)
+# Mount static files directory for serving HTML files
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+@app.get("/")
 async def root():
-    # Mengembalikan file index.html
-    with open("index.html", "r") as file:
-        html_content = file.read()
-    return HTMLResponse(content=html_content)
+    # Menampilkan index.html yang telah dibuat sebelumnya
+    return FileResponse("static/index.html")
 
 @app.get("/motd")
 async def get_motd(session: SessionDep):
     # Mengambil message of the day secara acak dari database
-    statement = select(MOTD)
-    results = session.exec(statement).all()
+    result = session.exec(select(MOTD)).all()
     
-    if not results:
-        return {"message": "No messages available"}
+    if not result:
+        return JSONResponse(
+            status_code=404,
+            content={"message": "No messages found in database."}
+        )
     
-    random_message = random.choice(results)
-    return {"message": random_message.message}
+    # Pilih message secara acak
+    random_message = random.choice(result)
+    return random_message
 
 @app.post("/motd")
 async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
     current_password_bytes = credentials.password.encode("utf8")
     valid_username, valid_password = False, False
-
+    
     try:
-        if credentials.username in users:
+        if credentials.username in allowed_users:
             valid_username = True
-            s = base64.b32encode(users.get(credentials.username).encode("utf-8")).decode("utf-8")
+            s = base64.b32encode(allowed_users.get(credentials.username).encode("utf-8")).decode("utf-8")
             totp = pyotp.TOTP(s=s, digest="SHA256", digits=8)
             valid_password = secrets.compare_digest(current_password_bytes, totp.now().encode("utf8"))
-
+            
             if valid_password and valid_username:
-                # Menambahkan message of the day baru ke database
-                new_motd = MOTD(message=message.message)
-                session.add(new_motd)
+                # Menambahkan message of the day ke basis data
+                db_message = MOTD.from_orm(message)
+                session.add(db_message)
                 session.commit()
-                return {"status": "success", "message": "Message added successfully"}
+                session.refresh(db_message)
+                return db_message
             else:
-                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid userid or password.")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED, 
+                    detail="Invalid userid or password."
+                )
         else:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid userid or password.")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED, 
+                detail="Invalid userid or password."
+            )
     except HTTPException as e:
         raise e
 
 if __name__ == "__main__":
-    # Membuat database dan tabel jika belum ada
+    import uvicorn
+    
     create_db_and_tables()
-    # Menjalankan server uvicorn
+    
     uvicorn.run(app, host="0.0.0.0", port=17787)
