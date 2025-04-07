@@ -1,25 +1,30 @@
 import requests
 import pyotp
-import time
 import base64
-import json
 
-# ganti dengan userid dan shared secret yang ingin dicoba
-userid = "sister"
-shared_secret = "ii2210_sister_semangatTucil"
+userid = "vaelya"
+shared_secret = "ii2210_vaelya"
 
-# ganti dengan url server kalian
-server_url = "http://69.69.69.69:17787"
+server_url = "http://70.153.208.25:17787/motd"
 
-# ganti dengan motd yang diinginkan
-motd = {"motd" : "testing"}
+motd = {"motd": "KALO GABISA AKU NANGIS 😭"}
 
+# generate TOTP
 s = base64.b32encode(shared_secret.encode("utf-8")).decode("utf-8")
-totp = pyotp.TOTP(s=s,digest="SHA256",digits=8)
-x = f"{userid}:" + totp.now()
+totp = pyotp.TOTP(s=s, digest="SHA256", digits=8)
+current_otp = totp.now()
 
-a = "Basic " + base64.b64encode(bytes(x,encoding="ascii")).decode("ascii")
+# buat header Authorization
+credentials = f"{userid}:{current_otp}"
+auth_header = "Basic " + base64.b64encode(credentials.encode("ascii")).decode("ascii")
 
-resp = requests.get(url=server_url, headers={"Authorization" : a}, json=motd)
+# kirim POST request
+response = requests.post(
+    url=server_url,
+    headers={"Authorization": auth_header},
+    json=motd
+)
 
-print(resp.content.decode("utf-8"))
+# tampilkan hasil response
+print(response.status_code)
+print(response.content.decode("utf-8"))

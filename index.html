@@ -1,187 +1,105 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Perjalanan Pribadiku</title>
+    <title>Message of the Day</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #ea98ff, #ff95e4);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            perspective: 1000px;
-            overflow: hidden;
-            color: white;
-        }
-        .container {
-            position: relative;
-            width: 450px;
-            height: 600px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            backdrop-filter: blur(15px);
+            background-color: #eef2f5;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 30px;
-            transform-style: preserve-3d;
-            transition: all 0.3s ease;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-        .layer {
-            position: absolute;
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        blockquote {
+            font-size: 1.3em;
+            color: #444;
+            background: #fff;
+            padding: 20px;
+            border-left: 5px solid #4CAF50;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            max-width: 600px;
             width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            transition: all 0.3s ease;
-        }
-        .layer-1 {
-            background: rgba(255,255,255,0.05);
-            transform: translateZ(50px);
-        }
-        .layer-2 {
-            background: rgba(255,255,255,0.1);
-            transform: translateZ(100px);
-        }
-        .avatar {
-            width: 180px;
-            height: 180px;
-            background: radial-gradient(circle, #ff9a9e, #fad0c4);
-            border-radius: 50%;
-            border: 5px solid white;
-            object-fit: cover;
             margin-bottom: 20px;
-            transform: translateZ(150px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        .profile-content {
-            text-align: center;
-            transform: translateZ(200px);
+
+        footer {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #666;
         }
-        .name {
-            font-size: 28px;
-            margin-bottom: 10px;
-            transform: translateZ(250px);
-        }
-        .title {
-            color: #ddd;
-            margin-bottom: 20px;
-            transform: translateZ(300px);
-        }
-        .skills {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 20px;
-            transform: translateZ(350px);
-        }
-        .skill-tag {
-            background: rgba(255, 106, 193, 0.404);
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 14px;
-        }
-        .social-links {
-            display: flex;
-            justify-content: center;
-            margin-top: 30px;
-            transform: translateZ(400px);
-        }
-        .social-links a {
-            color: white;
-            margin: 0 15px;
-            text-decoration: none;
-            font-size: 24px;
-            transition: transform 0.3s;
-        }
-        .social-links a:hover {
-            transform: scale(1.2) rotate(360deg);
-        }
-        .footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 25px;
-            font-weight: bold;
-        }
-        .footer1 {
-            margin-top: 13px;
-            text-align: center;
+
+        button {
+            padding: 12px 24px;
             font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .note {
+            margin-top: 30px;
+            font-size: 0.9em;
+            color: #777;
         }
     </style>
+    <script>
+        async function getNewMessage() {
+            const motdText = document.getElementById('motd');
+            const creatorText = document.getElementById('creator');
+            const createdAtText = document.getElementById('created_at');
+
+            try {
+                motdText.innerText = "Mengambil pesan...";
+                creatorText.innerText = "";
+                createdAtText.innerText = "";
+
+                const response = await fetch('/motd');
+                if (!response.ok) throw new Error('Terjadi kesalahan saat fetch');
+
+                const data = await response.json();
+
+                motdText.innerText = `"${data.motd}"`;
+                creatorText.innerText = `— ${data.creator}`;
+                createdAtText.innerText = `, ${new Date(data.created_at).toLocaleString()}`;
+            } catch (error) {
+                motdText.innerText = "Gagal memuat pesan 😞";
+                console.error(error);
+            }
+        }
+
+        window.onload = getNewMessage;
+    </script>
 </head>
 <body>
-    <div id="parallax-container" class="container">
-        <div class="layer layer-1"></div>
-        <div class="layer layer-2"></div>
-        
-        <img src="" alt="" class="avatar">
-        
-        <div class="profile-content">
-            <h1 class="name">Nakeisha Valya Shakila</h1>
-            <h2 class="title">18223133</h2>
-            
-            <div class="skills">
-                <span class="skill-tag">Listening to Music</span>
-                <span class="skill-tag">Watching Movies</span>
-                <span class="skill-tag">Cooking</span>
-            </div>
-            
-            <div class="social-links">
-                <a href="https://www.instagram.com/nakeisha_valya" title="lets goww kita mutualan">📷</a>
-                <a href="https://www.instagram.com/nangorstian" title="follow ig kelas jg dong hehe">💽</a>
-                <a href="https://www.instagram.com/dibalikhmif" title="ini bingung">📹</a>
-            </div>
-            <div class="footer">
-                <p>Tugas Kecil 1 - II2210</p>
-            </div>
-            <div class="footer1">
-                <p>- kak tolong jangan susahin tugasnya:( -</p>
-            </div>
-        </div>
-    </div>
 
-    <script>
-        const container = document.getElementById('parallax-container');
-        const layers = document.querySelectorAll('.layer');
+    <h1>✨ Message of the Day ✨</h1>
 
-        document.addEventListener('mousemove', (e) => {
-            // Koordinat mouse relatif terhadap layar
-            const centerX = window.innerWidth / 2;
-            const centerY = window.innerHeight / 2;
-            
-            // Hitung perpindahan
-            const moveX = (e.clientX - centerX) / 20;
-            const moveY = (e.clientY - centerY) / 20;
-            
-            // Animasi parallax multi-layer
-            container.style.transform = `
-                perspective(1000px) 
-                rotateX(${-moveY}deg) 
-                rotateY(${moveX}deg)
-            `;
-            
-            // Efek layer berbeda
-            layers[0].style.transform = `translateX(${-moveX}px) translateY(${-moveY}px)`;
-            layers[1].style.transform = `translateX(${-moveX * 1.5}px) translateY(${-moveY * 1.5}px)`;
-        });
+    <blockquote>
+        <p id="motd">Memuat...</p>
+        <footer><cite id="creator"></cite><span id="created_at"></span></footer>
+    </blockquote>
 
-        // Kembalikan ke posisi semula
-        document.addEventListener('mouseleave', () => {
-            container.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-            layers.forEach(layer => {
-                layer.style.transform = 'translateX(0) translateY(0)';
-            });
-        });
-    </script>
+    <button onclick="getNewMessage()">🎲 Dapatkan Pesan Baru</button>
+
+    <div class="note">Endpoint: <code>GET /motd</code> — Mengambil pesan acak dari server.</div>
+
 </body>
 </html>

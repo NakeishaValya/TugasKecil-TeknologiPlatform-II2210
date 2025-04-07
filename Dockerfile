@@ -8,12 +8,9 @@ WORKDIR /app
 COPY . .
 
 # Menginstal dependensi yang dibutuhkan
-RUN pip install --no-cache-dir \
-    fastapi>=0.95.0 \
-    uvicorn>=0.21.1 \
-    sqlmodel>=0.0.8 \
-    pyotp>=2.8.0 \
-    python-multipart>=0.0.6
+RUN pip install --no-cache-dir -r requirements.txt
+
+# RUN python -c "from main import init_db; init_db()"
 
 # Mengekspos port yang digunakan oleh aplikasi
 EXPOSE 17787
