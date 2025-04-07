@@ -41,8 +41,12 @@ async def get_motd(session: SessionDep):
     # Silahkan lengkapi dengan kode untuk memberikan message of the day
     motd = session.query(MOTD).order_by(func.random()).first()
     if motd:
-        return {"message": motd.motd}
-    return {"message": "No message found."}
+        return {
+            "motd": motd.motd,
+            "creator": motd.creator,
+            "created_at": motd.created_at
+        }
+    raise HTTPException(status_code=404, detail="No message found.")
 
 @app.post("/motd")
 async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotated[HTTPBasicCredentials, Depends(security)]):
@@ -71,4 +75,5 @@ async def post_motd(message: MOTDBase, session: SessionDep, credentials: Annotat
 
 if __name__ == "__main__":
     import uvicorn
+    create_db_and_tables()
     uvicorn.run("main:app", host="0.0.0.0", port=17787, reload=True)

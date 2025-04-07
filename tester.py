@@ -7,7 +7,7 @@ shared_secret = "ii2210_vaelya"
 
 server_url = "http://70.153.208.25:17787/motd"
 
-motd = {"motd": "KALO GABISA AKU NANGIS 😭"}
+motd = {"motd": "haihai"}
 
 # generate TOTP
 s = base64.b32encode(shared_secret.encode("utf-8")).decode("utf-8")
