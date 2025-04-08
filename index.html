@@ -295,7 +295,7 @@
                 creatorText.innerText = "";
                 createdAtText.innerText = "";
                 
-                const response = await fetch('/motd'); 
+                const response = await fetch('/api/motd'); 
                 if (!response.ok) throw new Error('Terjadi kesalahan saat fetch'); 
  
                 const data = await response.json(); 
