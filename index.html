@@ -1,105 +1,383 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
     <meta charset="UTF-8">
-    <title>Message of the Day</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef2f5;
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Of The Day - Tucil 2</title> 
+    <style> 
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary-color: #6a5acd;
+            --primary-light: #8a7ddd;
+            --primary-dark: #483d8b;
+            --accent-color: #ff7f50;
+            --text-color: #333;
+            --light-text: #777;
+            --bg-color: #f8f9fa;
+            --card-bg: #fff;
+            --shadow: 0 10px 30px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 20px; 
+            transition: var(--transition);
+        } 
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+ 
+        h1 { 
+            color: var(--primary-color); 
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        } 
+        
+        h1::after {
+            content: '';
+            position: absolute;
+            width: 40%;
+            height: 3px;
+            background-color: var(--accent-color);
+            bottom: -5px;
+            left: 30%;
+        }
+ 
+        .quote-card {
+            background: var(--card-bg); 
+            padding: 30px; 
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            max-width: 700px; 
+            width: 100%; 
+            margin: 30px auto;
+            position: relative;
+            transition: var(--transition);
+            overflow: hidden;
+        }
+        
+        .quote-card::before {
+            content: '"';
+            position: absolute;
+            top: -20px;
+            left: 10px;
+            font-size: 8rem;
+            color: rgba(106, 90, 205, 0.1);
+            font-family: Georgia, serif;
+            z-index: 0;
+        }
+        
+        .quote-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(106, 90, 205, 0.15);
+        }
+ 
+        #motd { 
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--text-color); 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.6;
+        } 
+ 
+        footer { 
             display: flex;
-            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        } 
+        
+        #creator {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        #created_at {
+            color: var(--light-text);
+            margin-left: 5px;
+        }
+ 
+        .btn-container {
+            margin: 20px 0;
+        }
+        
+        button { 
+            padding: 14px 30px; 
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: var(--primary-color); 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(106, 90, 205, 0.3);
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+        } 
+ 
+        button:hover { 
+            background-color: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(106, 90, 205, 0.4);
+        } 
+        
+        button:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 10px rgba(106, 90, 205, 0.3);
         }
-
-        h1 {
-            color: #333;
-            margin-bottom: 30px;
+        
+        button .dice {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            animation: wiggle 1s ease-in-out infinite;
         }
-
-        blockquote {
-            font-size: 1.3em;
-            color: #444;
-            background: #fff;
-            padding: 20px;
-            border-left: 5px solid #4CAF50;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 600px;
-            width: 100%;
-            margin-bottom: 20px;
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(10deg); }
+            75% { transform: rotate(-10deg); }
         }
-
-        footer {
-            margin-top: 10px;
-            font-size: 0.9em;
-            color: #666;
+ 
+        .note { 
+            margin-top: 30px; 
+            font-size: 0.9rem;
+            padding: 15px 20px;
+            border-radius: 8px;
+            background-color: rgba(106, 90, 205, 0.1);
+            color: var(--primary-dark);
+            display: inline-block;
+        } 
+        
+        code {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: monospace;
         }
-
-        button {
-            padding: 12px 24px;
-            font-size: 16px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 6px;
+        
+        .loader {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(106, 90, 205, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        /* Dark mode toggle */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            transition: background-color 0.3s;
+            box-shadow: var(--shadow);
+            z-index: 100;
         }
-
-        button:hover {
-            background-color: #45a049;
+        
+        .theme-toggle i {
+            font-size: 1.2rem;
+            color: var(--primary-color);
         }
-
-        .note {
-            margin-top: 30px;
-            font-size: 0.9em;
-            color: #777;
+        
+        /* Dark mode */
+        .dark-mode {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --text-color: #e6e6e6;
+            --light-text: #b8b8b8;
+            --shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-    </style>
-    <script>
-        async function getNewMessage() {
-            const motdText = document.getElementById('motd');
-            const creatorText = document.getElementById('creator');
-            const createdAtText = document.getElementById('created_at');
-
-            try {
-                motdText.innerText = "Mengambil pesan...";
-                creatorText.innerText = "";
-                createdAtText.innerText = "";
-
-                const response = await fetch('/motd');
-                if (!response.ok) throw new Error('Terjadi kesalahan saat fetch');
-
-                const data = await response.json();
-
-                motdText.innerText = `"${data.motd}"`;
-                creatorText.innerText = `— ${data.creator}`;
-                createdAtText.innerText = `, ${new Date(data.created_at).toLocaleString()}`;
-            } catch (error) {
-                motdText.innerText = "Gagal memuat pesan 😞";
-                console.error(error);
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .quote-card {
+                padding: 20px;
+            }
+            
+            #motd {
+                font-size: 1.3rem;
+            }
+            
+            button {
+                padding: 12px 24px;
             }
         }
-
-        window.onload = getNewMessage;
-    </script>
-</head>
-<body>
-
-    <h1>✨ Message of the Day ✨</h1>
-
-    <blockquote>
-        <p id="motd">Memuat...</p>
-        <footer><cite id="creator"></cite><span id="created_at"></span></footer>
-    </blockquote>
-
-    <button onclick="getNewMessage()">🎲 Dapatkan Pesan Baru</button>
-
-    <div class="note">Endpoint: <code>GET /motd</code> — Mengambil pesan acak dari server.</div>
-
-</body>
+        
+        /* Quote animation */
+        .fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Footer watermark */
+        .watermark {
+            position: fixed;
+            bottom: 5px;
+            right: 10px;
+            font-size: 0.7rem;
+            color: rgba(119, 119, 119, 0.2);
+            letter-spacing: 0.5px;
+            pointer-events: none;
+            font-family: monospace;
+        }
+    </style> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script> 
+        async function getNewMessage() { 
+            const motdText = document.getElementById('motd'); 
+            const creatorText = document.getElementById('creator'); 
+            const createdAtText = document.getElementById('created_at');
+            const quoteCard = document.querySelector('.quote-card');
+            const loader = document.getElementById('loader');
+            
+            try { 
+                // Show loader, hide quote content
+                loader.classList.remove('hidden');
+                motdText.innerText = "";
+                creatorText.innerText = "";
+                createdAtText.innerText = "";
+                
+                const response = await fetch('/motd'); 
+                if (!response.ok) throw new Error('Terjadi kesalahan saat fetch'); 
+ 
+                const data = await response.json(); 
+                
+                // Hide loader
+                loader.classList.add('hidden');
+                
+                // Update with new content with animation
+                quoteCard.classList.remove('fade-in');
+                void quoteCard.offsetWidth; // Trigger reflow
+                quoteCard.classList.add('fade-in');
+                
+                motdText.innerText = data.motd; 
+                creatorText.innerText = data.creator; 
+                createdAtText.innerText = new Date(data.created_at).toLocaleString();
+                
+                // Animate the dice
+                const dice = document.querySelector('.dice');
+                dice.style.animation = 'none';
+                void dice.offsetWidth; // Trigger reflow
+                dice.style.animation = 'wiggle 1s ease-in-out infinite';
+            } catch (error) { 
+                loader.classList.add('hidden');
+                motdText.innerText = "Gagal memuat pesan 😞"; 
+                console.error(error); 
+            } 
+        } 
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const themeIcon = document.getElementById('theme-icon');
+            
+            if (document.body.classList.contains('dark-mode')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            }
+        }
+ 
+        window.onload = function() {
+            getNewMessage();
+            
+            // Check preferred color scheme
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                toggleDarkMode();
+            }
+        };
+    </script> 
+</head> 
+<body> 
+    <div class="theme-toggle" onclick="toggleDarkMode()">
+        <i id="theme-icon" class="fas fa-moon"></i>
+    </div>
+    
+    <div class="container">
+        <h1>✨ Kata-Kata Hari Ini ✨</h1> 
+        
+        <div class="quote-card fade-in"> 
+            <div id="loader" class="loader"></div>
+            <p id="motd"></p> 
+            <footer>
+                <div>
+                    <cite id="creator"></cite>
+                    <span id="created_at"></span>
+                </div>
+            </footer> 
+        </div> 
+        
+        <div class="btn-container">
+            <button onclick="getNewMessage()">
+                Paham? <span class="dice">🖐️</span> 
+        </div>
+        
+        <div class="note">
+            <i class="fas fa-info-circle"></i> 
+            Endpoint: <code>GET /motd</code> — Mengambil pesan acak dari server.
+        </div>
+    </div>
+    
+    <!-- Watermark samar untuk ID kursus -->
+    <div class="watermark">II2210 - Teknologi Platform</div>
+</body> 
 </html>

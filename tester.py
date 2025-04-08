@@ -8,8 +8,14 @@ shared_secret = "ii2210_vaelya"
 server_url = "http://70.153.208.25:17787/motd"
 
 messages = [
-    "Semangat!", 
-    "Jangan lupa bobo",
+    "Ada Gula Ada Semut, Udah la Ga Mut",
+    "Mau Tau Fakta Menarik? Ya Faktanya Kamu Menarik",
+    "Padahal Orang Kek Aku Gaada Di Keranjang Kuning",
+    "Hidup Selalu Kegocek Sama Ekspetasi Sendiri",
+    "HTS - Harus Tetap Shalat",
+    "Idup Cuma Sekali, Kacaunya Tiap Hari",
+    "Di Read Doang Emangnyh Ak Novel",
+    "Dihina Tidak Tumbang, Dipuji Tidak Terbang, DiTransfer Duit Makasih Bang",
 ]
 
 # generate TOTP
